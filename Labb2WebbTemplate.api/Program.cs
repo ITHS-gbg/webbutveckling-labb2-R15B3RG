@@ -1,8 +1,20 @@
 using Labb2WebbTemplate.DataAccess;
 using Labb2WebbTemplate.DataAccess.Entities;
 using System;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("CustomerProductOrderDb");
+
+builder.Services.AddDbContext<CustomerProductOrderDbContext>(
+
+	options => 
+		
+		options.UseSqlServer(connectionString)
+
+);
 
 builder.Services.AddSingleton<ProductRepository>();
 builder.Services.AddSingleton<CustomerRepository>();
