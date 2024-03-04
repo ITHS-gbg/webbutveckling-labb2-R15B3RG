@@ -16,14 +16,17 @@ builder.Services.AddDbContext<CustomerProductOrderDbContext>(
 
 );
 
-builder.Services.AddSingleton<ProductRepository>();
-builder.Services.AddSingleton<CustomerRepository>();
+//builder.Services.AddSingleton<ProductRepository>();
+//builder.Services.AddSingleton<CustomerRepository>();
+
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<CustomerRepository>();
 
 var app = builder.Build();
 
-app.MapGet("/products", (ProductRepository repo) =>
+app.MapGet("/pets", async (ProductRepository repo) =>  //Detta är nu ändrat. Fortsätt nedtill med Niklas
 {
-	return repo.Products;
+	return await repo.GetAllProducts();
 });
 
 app.MapGet("/products/{id:int}", (ProductRepository repo, int id) =>
