@@ -10,6 +10,6 @@ namespace Labb2WebbTemplate.DataAccess
 	public class CustomerRepository
 	{
 
-		public List<Customer> Customers { get; set; } = new();
+
 	}
 }

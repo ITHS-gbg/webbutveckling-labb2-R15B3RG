@@ -15,4 +15,6 @@ public class Product
 	public int Inventory { get; set; }
 
 	public bool InventoryBalance { get; set; }
+
+	public virtual ICollection<Customer> Customers { get; set; }
 }
