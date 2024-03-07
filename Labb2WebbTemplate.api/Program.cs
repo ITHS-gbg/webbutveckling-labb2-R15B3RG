@@ -50,7 +50,7 @@ app.MapPost("/products", async (ProductRepository repo, Product newProduct) =>
 		return Results.BadRequest($"A product is already registered with the id: {newProduct.Id}");
 	}
 
-	repo.AddProduct(newProduct);
+	await repo.AddProduct(newProduct);
 
 	return Results.Ok();
 });
@@ -100,7 +100,7 @@ app.MapPost("/customers", async(CustomerRepository repo, Customer newCustomer) =
 		return Results.BadRequest($"Customer with the Id: {newCustomer.Id} already exists");
 	}
 
-	repo.AddCustomer(newCustomer);
+	await repo.AddCustomer(newCustomer);
 
 	return Results.Ok();
 

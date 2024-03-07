@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Labb2WebbTemplate.DataAccess;
 using Labb2WebbTemplate.DataAccess.Entities;
 
-namespace Labb2WebbTemplate.DataAccess
-{
+namespace Labb2WebbTemplate.DataAccess;
+
 	public class CustomerRepository(CustomerProductOrderDbContext context)
 	{
 		public async Task<IEnumerable<Customer>> GetAllCustomers()
@@ -38,4 +39,4 @@ namespace Labb2WebbTemplate.DataAccess
 			await context.SaveChangesAsync();
 		}
 	}
-}
+
