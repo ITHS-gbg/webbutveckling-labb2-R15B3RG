@@ -32,12 +32,38 @@ namespace Labb2WebbTemplate.DataAccess
 			{
 				return;
 			}
-			oldProduct.Name = newProduct.Name;
-			oldProduct.Description = newProduct.Description;
-			oldProduct.Price = newProduct.Price;
-			oldProduct.Inventory = newProduct.Inventory;
-			oldProduct.ProductType = newProduct.ProductType;
-			oldProduct.InventoryBalance = newProduct.InventoryBalance;
+
+			if (newProduct.Name != String.Empty)
+			{
+				oldProduct.Name = newProduct.Name;
+			}
+
+			if (newProduct.Description != String.Empty)
+			{
+				oldProduct.Description = newProduct.Description;
+			}
+
+			if (newProduct.Price != 0)
+			{
+				oldProduct.Price = newProduct.Price;
+			}
+
+			if (newProduct.Inventory != 0)
+			{
+				oldProduct.Inventory = newProduct.Inventory;
+			}
+
+			if (newProduct.InventoryBalance != true)
+			{
+				oldProduct.InventoryBalance = newProduct.InventoryBalance;
+			}
+
+			if (newProduct.ProductType != String.Empty)
+			{
+				oldProduct.ProductType = newProduct.ProductType;
+			}
+			
+			
 			await context.SaveChangesAsync();
 		}
 

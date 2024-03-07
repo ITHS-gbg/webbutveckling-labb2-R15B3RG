@@ -63,6 +63,13 @@ app.MapPut("/products/{id}", async(ProductRepository repo, int id, Product prod)
 
 });
 
+app.MapDelete("/products/{id}", async(ProductRepository repo, int id) =>
+{
+	await repo.DeleteProduct(id);
+
+	return Results.Ok();
+
+});
 
 //------------------------------------------------------------------------------------------------------------
 
