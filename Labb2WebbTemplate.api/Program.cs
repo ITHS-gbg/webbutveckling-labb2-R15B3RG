@@ -55,6 +55,15 @@ app.MapPost("/products", async (ProductRepository repo, Product newProduct) =>
 	return Results.Ok();
 });
 
+app.MapPut("/products/{id}", async(ProductRepository repo, int id, Product prod) =>
+{
+	await repo.UpdateProduct(id, prod);
+
+	return Results.Ok();
+
+});
+
+
 //------------------------------------------------------------------------------------------------------------
 
 app.MapGet("/customers", async (CustomerRepository repo) => 

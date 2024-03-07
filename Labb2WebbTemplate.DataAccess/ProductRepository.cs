@@ -25,15 +25,34 @@ namespace Labb2WebbTemplate.DataAccess
 			return await context.Products.FindAsync(id);
 		}
 
-		public async Task UpdateProductName(int id, string name)
+		public async Task UpdateProduct(int id, Product newProduct)
 		{
 			var oldProduct = await context.Products.FindAsync(id);
 			if (oldProduct is null)
 			{
 				return;
 			}
-			oldProduct.Name = name;
+			oldProduct.Name = newProduct.Name;
+			oldProduct.Description = newProduct.Description;
+			oldProduct.Price = newProduct.Price;
+			oldProduct.Inventory = newProduct.Inventory;
+			oldProduct.ProductType = newProduct.ProductType;
+			oldProduct.InventoryBalance = newProduct.InventoryBalance;
 			await context.SaveChangesAsync();
+		}
+
+		public async Task DeleteProduct(int id)
+		{
+			var selectedProduct = await context.Products.FindAsync(id);
+
+			if (selectedProduct is null)
+			{
+				return;
+			}
+
+			context.Products.Remove(selectedProduct);
+			await context.SaveChangesAsync();
+			
 		}
 	}
 }
