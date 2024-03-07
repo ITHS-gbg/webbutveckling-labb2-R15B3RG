@@ -24,48 +24,48 @@ builder.Services.AddScoped<CustomerRepository>();
 
 var app = builder.Build();
 
-app.MapGet("/pets", async (ProductRepository repo) =>  //Detta är nu ändrat. Fortsätt nedtill med Niklas
+app.MapGet("/products", async (ProductRepository repo) =>  //Detta är nu ändrat. Fortsätt nedtill med Niklas
 {
 	return await repo.GetAllProducts();
 });
 
-app.MapGet("/products/{id:int}", (ProductRepository repo, int id) =>
+app.MapGet("/products/{id:int}", async(ProductRepository repo, int id) =>
 {
-	var product = repo.Products.FirstOrDefault(p => p.Id == id);
+	var product = await repo.GetProductById(id); // <------ Ska det finnas en Async och en Await här????????
 
 	if (product is null) //Använd gärna alltid "is null" istället för "== null"
 	{
-		return Results.NotFound($"No pet exists with the given Id: {id}");  //Här vill vi INTE göra en ActionResult!
+		return Results.NotFound($"No product exists with the given Id: {id}");  //Här vill vi INTE göra en ActionResult!
 	}
 
 	return Results.Ok(product);
 });
 
-app.MapPost("/products", (ProductRepository repo, Product newProduct) =>
+app.MapPost("/products", async (ProductRepository repo, Product newProduct) =>
 {
+	var existingProduct = await repo.GetProductById(newProduct.Id);
 
-	if (repo.Products.Any(p => p.Id == newProduct.Id))
+	if (existingProduct is not null)
 	{
 		return Results.BadRequest($"A product is already registered with the id: {newProduct.Id}");
 	}
 
-	repo.Products.Add(newProduct);
+	repo.AddProduct(newProduct);
 
 	return Results.Ok();
-
 });
 
 //------------------------------------------------------------------------------------------------------------
 
-app.MapGet("/customers", (CustomerRepository repo) => 
+app.MapGet("/customers", async (CustomerRepository repo) => 
 {
-	return repo.Customers;
+	return await repo.GetAllCustomers();
 });
 
 
-app.MapGet("/customers/{id:int}", (CustomerRepository repo, int id) =>
+app.MapGet("/customers/{id:int}", async (CustomerRepository repo, int id) =>
 {
-	var customer = repo.Customers.FirstOrDefault(c => c.Id == id);
+	var customer = await repo.GetCustomerById(id);
 
 	if (customer is null) //Använd gärna alltid "is null" istället för "== null"
 	{
@@ -75,15 +75,16 @@ app.MapGet("/customers/{id:int}", (CustomerRepository repo, int id) =>
 	return Results.Ok(customer);
 });
 
-app.MapPost("/customers", (CustomerRepository repo, Customer newCustomer) =>
+app.MapPost("/customers", async(CustomerRepository repo, Customer newCustomer) =>
 {
+	var existingCustomer = await repo.GetCustomerById(newCustomer.Id);
 
-	if (repo.Customers.Any(c => c.Id == newCustomer.Id))
+	if (existingCustomer is not null)
 	{
 		return Results.BadRequest($"Customer with the Id: {newCustomer.Id} already exists");
 	}
 
-	repo.Customers.Add(newCustomer);
+	repo.AddCustomer(newCustomer);
 
 	return Results.Ok();
 
