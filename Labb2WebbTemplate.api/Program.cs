@@ -106,4 +106,24 @@ app.MapPost("/customers", async(CustomerRepository repo, Customer newCustomer) =
 
 });
 
+app.MapPut("/customers/{id}", async (CustomerRepository repo, int id, Customer customer) =>
+{
+	await repo.UpdateCustomer(id, customer);
+
+	return Results.Ok();
+
+});
+
+app.MapGet("/customers/{email}", async (CustomerRepository repo, string email) =>
+{
+	var customer = await repo.GetCustomerByEmail(email);
+
+	if (customer is null) //Använd gärna alltid "is null" istället för "== null"
+	{
+		return Results.NotFound($"No customer exists with the given Email: {email}");  //Här vill vi INTE göra en ActionResult!
+	}
+
+	return Results.Ok(customer);
+});
+
 app.Run();

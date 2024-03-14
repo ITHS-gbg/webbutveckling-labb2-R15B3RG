@@ -1,4 +1,6 @@
-﻿namespace Labb2WebbTemplate.DataAccess.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Labb2WebbTemplate.DataAccess.Entities;
 
 public class Customer
 {
@@ -8,8 +10,10 @@ public class Customer
 
 	public string LastName { get; set; }
 
+	[EmailAddress]
 	public string Email { get; set; }
 
+	[Phone]
 	public string PhoneNumber { get; set; }
 
 	public string Address { get; set; }
