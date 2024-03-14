@@ -48,7 +48,7 @@ namespace Labb2WebbTemplate.DataAccess
 				oldProduct.Price = newProduct.Price;
 			}
 
-			if (newProduct.Inventory != 0)
+			if (newProduct.Inventory > -1)
 			{
 				oldProduct.Inventory = newProduct.Inventory;
 			}
