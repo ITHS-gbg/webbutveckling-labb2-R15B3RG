@@ -11,6 +11,8 @@ public class CustomerProductOrderDbContext : DbContext
 
 	public DbSet<Product> Products { get; set; }
 
+	public DbSet<Order> Orders { get; set; }
+
 	public CustomerProductOrderDbContext(DbContextOptions options) : base(options)
 
 	{

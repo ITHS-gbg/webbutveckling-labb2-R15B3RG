@@ -21,6 +21,7 @@ builder.Services.AddDbContext<CustomerProductOrderDbContext>(
 
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<CustomerRepository>();
+builder.Services.AddScoped<OrderRepository>();
 
 var app = builder.Build();
 
@@ -124,6 +125,32 @@ app.MapGet("/customers/{email}", async (CustomerRepository repo, string email) =
 	}
 
 	return Results.Ok(customer);
+});
+
+//---------------------------------------------------------------------------------
+
+app.MapPost("/orders", async (OrderRepository repo, CreateOrderDto createOrderDto) =>
+{
+	var newOrder = await repo.CreateOrder(createOrderDto);
+
+	if (newOrder is null)
+	{
+		return Results.BadRequest("Failed to create order");
+	}
+
+	return Results.Ok();
+});
+
+app.MapGet("/orders/{id:int}", async (OrderRepository repo, int id) =>
+{
+	var order = await repo.GetOrderById(id);
+
+	if (order is null) //Använd gärna alltid "is null" istället för "== null"
+	{
+		return Results.NotFound($"No order exists with the given Id: {id}");  //Här vill vi INTE göra en ActionResult!
+	}
+
+	return Results.Ok(order);
 });
 
 app.Run();
