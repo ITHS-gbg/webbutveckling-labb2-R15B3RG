@@ -2,6 +2,7 @@ using Labb2WebbTemplate.DataAccess;
 using Labb2WebbTemplate.DataAccess.Entities;
 using System;
 using Microsoft.EntityFrameworkCore;
+using Labb2WebbTemplate.shared.DTOs;
 
 
 var builder = WebApplication.CreateBuilder(args);

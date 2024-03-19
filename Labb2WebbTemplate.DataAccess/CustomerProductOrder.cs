@@ -2,6 +2,7 @@
 using System;
 using Labb2WebbTemplate.DataAccess.Entities;
 
+
 namespace Labb2WebbTemplate.DataAccess;
 
 public class CustomerProductOrderDbContext : DbContext

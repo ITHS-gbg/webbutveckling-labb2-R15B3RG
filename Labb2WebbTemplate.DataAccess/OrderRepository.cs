@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Labb2WebbTemplate.DataAccess.Entities;
+using Labb2WebbTemplate.shared.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace Labb2WebbTemplate.DataAccess
 {
-	public class OrderRepository
+    public class OrderRepository
 	{
 		private readonly CustomerProductOrderDbContext context;
 
