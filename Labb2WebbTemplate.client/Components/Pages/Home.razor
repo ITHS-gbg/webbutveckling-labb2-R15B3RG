@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Labb2WebbTemplate.DataAccess.Entities
+@using Labb2WebbTemplate.shared.DTOs
 @inject IHttpClientFactory HttpClientFactory
 <PageTitle>Home</PageTitle>
 
@@ -7,18 +8,49 @@
 
 Welcome to your new app.
 
+@foreach (var product in Products)
+{
+	<h3> @product.Id </h3>
+    <h3> @product.Name </h3>
+    <h3> @product.Price </h3>
+    <h3> @product.ProductType </h3>
+    <h3> @product.Description </h3>
+    <h3> @product.Inventory  </h3>
+    <h3> @product.InventoryBalance </h3>
+
+}
 
 
 
 @code
 {
 
-	protected override async Task OnInitializedAsync()
-	{
-		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
-		var response = await httpClient.GetAsync("products");
-		var response2 = await httpClient.GetAsync("customers");
-		var bodyAsString = response.Content.ReadFromJsonAsync<List<Product>>();// Kan även skriva <List<GetPetDto>>();
+    public List<Product> Products { get; set; } = new();
+    public List<Customer> Customers { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
+        var response = await httpClient.GetAsync("products");
+
+        if (response.IsSuccessStatusCode)
+        {
+	        var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
+	        Products.AddRange(Products);
+        }
+
+        var response2 = await httpClient.GetAsync("customers");
+
+        if (response2.IsSuccessStatusCode)
+        {
+	        var customers = await response.Content.ReadFromJsonAsync<List<GetCustomerDto>>();
+            Customers.AddRange(Customers);
+        }
+        
+       
+
+        
+
 	}
 
 }

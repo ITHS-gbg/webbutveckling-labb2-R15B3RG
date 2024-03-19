@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Labb2WebbTemplate.shared.DTOs
 {
-	internal class GetProductDto
+    public class GetProductDto
 	{
 		public int Id { get; set; }
 
