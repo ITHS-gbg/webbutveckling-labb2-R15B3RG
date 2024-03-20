@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Labb2WebbTemplate.DataAccess.Entities;
+namespace Labb2WebbTemplate.shared.Entities;
 
 public class Order
 {
