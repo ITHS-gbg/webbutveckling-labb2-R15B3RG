@@ -10,15 +10,23 @@
 Welcome to your new app.
 
 
-
+<div class="product-grid">
 	@foreach (var product in Products)
 	{
-		<h3> @product.Id </h3>
-		<h3> @product.Name </h3>
-		<h3> @product.Price </h3>
+		<div class="product-card">
+			<h3>@product.Name</h3>
+			<p><strong>Id:</strong> @product.Id</p>
+			<p><strong>Price:</strong> @product.Price</p>
+			<p><strong>Description:</strong> @product.Description</p>
+			<p><strong>Type:</strong> @product.ProductType</p>
+			<p><strong>Inventory:</strong> @product.Inventory</p>
+			<p><strong>Inventory Balance:</strong> @product.InventoryBalance</p>
+		</div>
 	}
+	</div>
 
 	<button @onclick="GetProducts">Get Products</button>
+	
 	
 	<h2>Add New Product</h2>
 	<form>
@@ -40,8 +48,9 @@ Welcome to your new app.
 		<label for="inventoryBalance">Inventory Balance:</label>
 		<input type="checkbox" id="inventoryBalance" @bind="NewProduct.InventoryBalance" /><br />
 
-		<button @onclick="AddProduct">Add Product</button>
+		<button type="submit" @onclick="AddProduct">Add Product</button>
 	</form>
+	
 	
 	
 
@@ -49,7 +58,7 @@ Welcome to your new app.
 {
 
     public List<GetProductDto>? Products { get; set; } = new();
-    public PostProductDto NewProduct { get; set; } = new();
+	public PostProductDto NewProduct { get; set; } = new();
 
 
     // protected override async Task OnInitializedAsync()
@@ -82,35 +91,34 @@ Welcome to your new app.
 	    }
     }
 
-    private async Task LoadProducts()
-    {
-	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
-	    var response = await httpClient.GetAsync("/products");
-
-	    if (response.IsSuccessStatusCode)
-	    {
-		    Products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
-	    }
-	    else
-	    {
-		    Console.WriteLine("Failed to load products.");
-	    }
-    }
-
     private async Task AddProduct()
     {
 	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+
 	    var response = await httpClient.PostAsJsonAsync("/products", NewProduct);
 
 	    if (response.IsSuccessStatusCode)
 	    {
-		    
-	    }
-
-	    else
-	    {
-		    // Handle error response
-		    Console.WriteLine("Failed to add product.");
+			NewProduct = new PostProductDto();
 	    }
     }
+
 }
+
+		
+	<style>
+    .product-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .product-card {
+        width: calc(33.33% - 20px); /* Tar upp en tredjedel av bredden med 20px mellanrum */
+        margin-bottom: 20px; /* Mellanrum mellan varje produktkort */
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+</style>
