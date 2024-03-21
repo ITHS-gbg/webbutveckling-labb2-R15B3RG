@@ -1,4 +1,5 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 @using Labb2WebbTemplate.shared.DTOs
 @using Labb2WebbTemplate.shared.Entities
 @inject IHttpClientFactory HttpClientFactory
@@ -17,27 +18,41 @@ Welcome to your new app.
 		<h3> @product.Price </h3>
 	}
 
+	<button @onclick="Test">Get Products</button>
 
-
-@code
+	@code
 {
 
-    public List<GetProductDto> Products { get; set; } = new();
+    public List<GetProductDto>? Products { get; set; } = new();
  
 
-    protected override async Task OnInitializedAsync()
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
+    //     var response = await httpClient.GetAsync("/products");
+
+    //     if (response.IsSuccessStatusCode)
+    //     {
+	   //      var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
+	   //      Products.AddRange(products);
+    //     }
+
+    //     // var bodyAsString = response.Content.ReadAsStringAsync();
+
+    // }
+
+    private async Task Test()
     {
-        var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
-        var response = await httpClient.GetAsync("/products");
+	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
+	    var response = await httpClient.GetAsync("/products");
 
-        if (response.IsSuccessStatusCode)
-        {
-	        var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
-	        Products.AddRange(products);
-        }
+	    if (response.IsSuccessStatusCode)
+	    {
+		    var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
 
-        // var bodyAsString = response.Content.ReadAsStringAsync();
+			Products.Clear();
 
+		    Products.AddRange(products);
+	    }
     }
-
 }

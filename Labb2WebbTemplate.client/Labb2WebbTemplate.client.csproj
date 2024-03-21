@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Labb2WebbTemplate.DataAccess\Labb2WebbTemplate.DataAccess.csproj" />
     <ProjectReference Include="..\Labb2WebbTemplate.shared\Labb2WebbTemplate.shared.csproj" />
   </ItemGroup>
 
