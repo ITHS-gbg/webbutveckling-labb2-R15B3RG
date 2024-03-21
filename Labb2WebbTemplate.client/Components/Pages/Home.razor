@@ -18,13 +18,39 @@ Welcome to your new app.
 		<h3> @product.Price </h3>
 	}
 
-	<button @onclick="Test">Get Products</button>
+	<button @onclick="GetProducts">Get Products</button>
+	
+	<h2>Add New Product</h2>
+	<form>
+		<label for="productName">Product Name:</label>
+		<input type="text" id="productName" @bind="NewProduct.Name" /><br />
+
+		<label for="productDescription">Description:</label>
+		<input type="text" id="productDescription" @bind="NewProduct.Description" /><br />
+
+		<label for="productPrice">Price:</label>
+		<input type="number" id="productPrice" @bind="NewProduct.Price" /><br />
+
+		<label for="productType">Product Type:</label>
+		<input type="text" id="productType" @bind="NewProduct.ProductType" /><br />
+
+		<label for="productInventory">Inventory:</label>
+		<input type="number" id="productInventory" @bind="NewProduct.Inventory" /><br />
+
+		<label for="inventoryBalance">Inventory Balance:</label>
+		<input type="checkbox" id="inventoryBalance" @bind="NewProduct.InventoryBalance" /><br />
+
+		<button @onclick="AddProduct">Add Product</button>
+	</form>
+	
+	
 
 	@code
 {
 
     public List<GetProductDto>? Products { get; set; } = new();
- 
+    public PostProductDto NewProduct { get; set; } = new();
+
 
     // protected override async Task OnInitializedAsync()
     // {
@@ -41,9 +67,9 @@ Welcome to your new app.
 
     // }
 
-    private async Task Test()
+    private async Task GetProducts()
     {
-	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
+	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
 	    var response = await httpClient.GetAsync("/products");
 
 	    if (response.IsSuccessStatusCode)
@@ -53,6 +79,38 @@ Welcome to your new app.
 			Products.Clear();
 
 		    Products.AddRange(products);
+	    }
+    }
+
+    private async Task LoadProducts()
+    {
+	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+	    var response = await httpClient.GetAsync("/products");
+
+	    if (response.IsSuccessStatusCode)
+	    {
+		    Products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
+	    }
+	    else
+	    {
+		    Console.WriteLine("Failed to load products.");
+	    }
+    }
+
+    private async Task AddProduct()
+    {
+	    var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+	    var response = await httpClient.PostAsJsonAsync("/products", NewProduct);
+
+	    if (response.IsSuccessStatusCode)
+	    {
+		    
+	    }
+
+	    else
+	    {
+		    // Handle error response
+		    Console.WriteLine("Failed to add product.");
 	    }
     }
 }
