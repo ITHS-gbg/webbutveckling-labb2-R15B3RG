@@ -13,6 +13,22 @@
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
-</body>
+    
+    <style>
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            width: calc(33% - 20px); /* Tar upp en tredjedel av bredden med 20px mellanrum */
+            margin-bottom: 20px; /* Mellanrum mellan varje produktkort */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    </body>
 
 </html>
