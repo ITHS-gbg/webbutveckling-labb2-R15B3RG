@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Labb2WebbTemplate.client.Components.Layout
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,10 +9,27 @@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="Labb2WebbTemplate.client.styles.css" />
     <HeadOutlet />
+    <nav>
+	    <ul>
+		    <li><NavLink href="/customers">Customers</NavLink></li>
+		    <li><NavLink href="/">Products</NavLink></li>
+		    <li><NavLink href="/orders">Orders</NavLink></li>
+	    </ul>
+    </nav>
 </head>
 
 <body>
-    <Routes />
+<Routes />
+<Router AppAssembly="@typeof(Program).Assembly">
+	<Found Context="routeData">
+		<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+	</Found>
+	<NotFound>
+		<LayoutView Layout="@typeof(MainLayout)">
+			<p>Sorry, there's nothing at this address.</p>
+		</LayoutView>
+	</NotFound>
+</Router>
     <script src="_framework/blazor.web.js"></script>
     
     <style>

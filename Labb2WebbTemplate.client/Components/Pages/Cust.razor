@@ -1,0 +1,46 @@
+﻿@page "/Customers"
+@rendermode InteractiveServer
+@using Labb2WebbTemplate.shared.DTOs
+@using Labb2WebbTemplate.shared.Entities
+@using Microsoft.EntityFrameworkCore
+@inject IHttpClientFactory HttpClientFactory
+<h3>Customers</h3>
+
+
+<button @onclick="GetCustomers">Get Customers</button>
+
+<div class="product-grid">
+	@foreach (GetCustomerDto customer in Customers)
+	{
+		<div class="product-card">
+			<h3>@customer.FirstName @customer.LastName</h3>
+			<p><strong>Id:</strong> @customer.Id</p>
+			<p><strong>Address:</strong> @customer.Address</p>
+			<p><strong>Phonenumber:</strong> @customer.PhoneNumber</p>
+			<p><strong>Email:</strong> @customer.Email</p>
+			@* <button @onclick="() => RemoveProduct(product)">Remove</button>
+			<button @onclick="() => EditProduct(product)">Edit</button> *@
+		</div>
+	}
+</div>
+
+@code {
+
+	public List<GetCustomerDto> Customers { get; set; } = new();
+
+	private async Task GetCustomers()
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+		var response = await httpClient.GetAsync("/customers");
+
+		if (response.IsSuccessStatusCode)
+		{
+			var customers = await response.Content.ReadFromJsonAsync<List<GetCustomerDto>>();
+
+			Customers.Clear();
+
+			Customers.AddRange(customers);
+		}
+	}
+
+}
