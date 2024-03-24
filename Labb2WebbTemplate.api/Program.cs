@@ -154,4 +154,16 @@ app.MapGet("/orders/{id:int}", async (OrderRepository repo, int id) =>
 	return Results.Ok(order);
 });
 
+app.MapGet("/orders", async (OrderRepository repo) =>
+{
+    var orders = await repo.GetAllOrders();
+
+    if (orders is null)
+    {
+        return Results.NotFound("No orders found.");
+    }
+
+    return Results.Ok(orders);
+});
+
 app.Run();

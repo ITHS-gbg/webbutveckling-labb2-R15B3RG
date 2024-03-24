@@ -53,6 +53,15 @@ namespace Labb2WebbTemplate.DataAccess
 				.FirstOrDefaultAsync(o => o.OrderId == id);
 				
 		}
-	}
+
+
+        public async Task<List<Order>> GetAllOrders()
+        {
+            return await context.Orders
+                .Include(o => o.Products)
+                .Include(o => o.Customer)
+                .ToListAsync();
+        }
+    }
 
 }

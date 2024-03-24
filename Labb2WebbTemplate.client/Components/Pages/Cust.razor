@@ -1,32 +1,95 @@
 ﻿@page "/Customers"
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
 @using Labb2WebbTemplate.shared.DTOs
 @using Labb2WebbTemplate.shared.Entities
 @using Microsoft.EntityFrameworkCore
 @inject IHttpClientFactory HttpClientFactory
+
+<button @onclick="NavigateToProducts">Go to Products page</button>
+<button @onclick="NavigateToCustomerOrderPage">Go to Customer Order Page</button>
+
 <h3>Customers</h3>
+
 
 
 <button @onclick="GetCustomers">Get Customers</button>
 
-<div class="product-grid">
+<div class="customer-grid">
 	@foreach (GetCustomerDto customer in Customers)
 	{
-		<div class="product-card">
+		<div class="customer-card">
 			<h3>@customer.FirstName @customer.LastName</h3>
 			<p><strong>Id:</strong> @customer.Id</p>
 			<p><strong>Address:</strong> @customer.Address</p>
 			<p><strong>Phonenumber:</strong> @customer.PhoneNumber</p>
 			<p><strong>Email:</strong> @customer.Email</p>
-			@* <button @onclick="() => RemoveProduct(product)">Remove</button>
-			<button @onclick="() => EditProduct(product)">Edit</button> *@
+			<button @onclick="() => EditCustomer(customer)">Edit</button>
 		</div>
 	}
 </div>
 
+@if (EditingCustomer != null)
+{
+	<div class="edit-form">
+		<h2>Edit Customer</h2>
+		<form>
+			<label for="customerFirstName">Customer Firstame:</label>
+			<input type="text" id="customerFirstName" @bind="EditingCustomer.FirstName" /><br />
+			<label for="customerLastName">Customer Lastname:</label>
+			<input type="text" id="customerLastName" @bind="EditingCustomer.LastName" /><br />
+			<label for="customerAddress">Customer Address:</label>
+			<input type="text" id="customerAddress" @bind="EditingCustomer.Address" /><br />
+			<label for="customerNumber">Customer Phonenumber:</label>
+			<input type="text" id="customerNumber" @bind="EditingCustomer.PhoneNumber" /><br />
+			<label for="customerEmail">Customer Email:</label>
+			<input type="text" id="customerEmail" @bind="EditingCustomer.Email" /><br />
+			<button type="submit" @onclick="() => UpdateCustomer(EditingCustomer)">Save Changes</button>
+			<button type="button" @onclick="CancelEdit">Cancel</button>
+		</form>
+	</div>
+}
+
+
+<h2>Fetch Customer By ID</h2>
+
+<input type="text" @bind="CustomerId" placeholder="Enter Customer ID" />
+<button @onclick="FetchCustomer">Fetch Customer</button>
+
+@if (FetchedCustomer != null)
+{
+	<div>
+		<h3>@FetchedCustomer.FirstName @FetchedCustomer.LastName</h3>
+		<p><strong>ID:</strong> @FetchedCustomer.Id</p>
+		<p><strong>Address:</strong> @FetchedCustomer.Address</p>
+		<p><strong>Phonenumber:</strong> @FetchedCustomer.PhoneNumber</p>
+		<p><strong>Email:</strong> @FetchedCustomer.Email</p>
+		
+	</div>
+}
+
+<h2>Add New Customer</h2>
+<form>
+	<label for="customerFirstName">Customer Firstame:</label>
+	<input type="text" id="customerFirstName" @bind="NewCustomer.FirstName" /><br />
+	<label for="customerLastName">Customer Lastname:</label>
+	<input type="text" id="customerLastName" @bind="NewCustomer.LastName" /><br />
+	<label for="customerAddress">Customer Address:</label>
+	<input type="text" id="customerAddress" @bind="NewCustomer.Address" /><br />
+	<label for="customerNumber">Customer Phonenumber:</label>
+	<input type="text" id="customerNumber" @bind="NewCustomer.PhoneNumber" /><br />
+	<label for="customerEmail">Customer Email:</label>
+	<input type="text" id="customerEmail" @bind="NewCustomer.Email" /><br />
+	<button type="submit" @onclick="AddCustomer">Add Customer</button>
+</form>
+
+
+
 @code {
 
 	public List<GetCustomerDto> Customers { get; set; } = new();
+	public PostCustomerDto NewCustomer { get; set; } = new();
+	public UpdateCustomerDto EditingCustomer { get; set; } = new();
 
 	private async Task GetCustomers()
 	{
@@ -43,4 +106,79 @@
 		}
 	}
 
+	private string CustomerId;
+	private GetCustomerDto FetchedCustomer;
+
+	private async Task FetchCustomer()
+	{
+		if (!string.IsNullOrEmpty(CustomerId))
+		{
+			var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+			var response = await httpClient.GetAsync($"/customers/{CustomerId}");
+
+			if (response.IsSuccessStatusCode)
+			{
+				Customers.Clear();
+
+				FetchedCustomer = await response.Content.ReadFromJsonAsync<GetCustomerDto>();
+			}
+
+		}
+	}
+
+	private async Task EditCustomer(GetCustomerDto customer)
+	{
+		EditingCustomer = new UpdateCustomerDto
+			{
+				Id = customer.Id,
+				FirstName = customer.FirstName,
+				LastName = customer.LastName,
+				Address = customer.Address,
+				PhoneNumber = customer.PhoneNumber,
+				Email = customer.Email
+			};
+	}
+
+	private async Task UpdateCustomer(UpdateCustomerDto customer)
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+		var response = await httpClient.PutAsJsonAsync($"/customers/{customer.Id}", EditingCustomer);
+
+		if (response.IsSuccessStatusCode)
+		{
+
+			EditingCustomer = new UpdateCustomerDto();
+
+
+			EditingCustomer = null;
+		}
+	}
+
+	private void CancelEdit()
+	{
+		EditingCustomer = null;
+	}
+
+
+	private async Task AddCustomer()
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+
+		var response = await httpClient.PostAsJsonAsync("/customers", NewCustomer);
+
+		if (response.IsSuccessStatusCode)
+		{
+			NewCustomer = new PostCustomerDto();
+		}
+	}
+
+	private void NavigateToProducts()
+	{
+		NavigationManager.NavigateTo("/");
+	}
+
+	private void NavigateToCustomerOrderPage()
+	{
+		NavigationManager.NavigateTo("/Orders");
+	}
 }
