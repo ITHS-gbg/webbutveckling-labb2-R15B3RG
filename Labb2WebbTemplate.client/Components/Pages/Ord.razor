@@ -1,0 +1,167 @@
+﻿@page "/Orders"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@using Labb2WebbTemplate.shared.DTOs
+@using System.Linq
+@inject IHttpClientFactory HttpClientFactory
+
+<button @onclick="NavigateToProducts">Go to Products page</button>
+<button @onclick="NavigateToCustomers">Go to Customers page</button>
+
+<h3>Orders</h3>
+
+<h2>Create Order</h2>
+<form>
+    <label for="customerId">Customer ID:</label>
+    <input type="number" id="customerId" @bind="NewOrder.CustomerId" /><br />
+
+    <label for="ProductIds">Products Ids:</label>
+    <input type="text" id="productIds" @bind="ProductIdsString" /><br />
+
+    <button type="submit" @onclick="CreateOrder">Create Order</button>
+</form>
+
+<div class="fetch-order">
+	<h4>Fetch Order by ID</h4>
+	<input type="number" @bind="Order.OrderId" />
+	<button @onclick="FetchOrder">Fetch Order</button>
+	<div class="order-details" style="margin-top: 20px;" hidden="@(!ShowOrderDetails)">
+		<h4>Order Details</h4>
+		@if (Order != null)
+		{
+			<p><strong>Order ID:</strong> @Order.OrderId</p>
+			<p><strong>Customer ID:</strong> @Order.CustomerId</p>
+			@if (Order.Customer != null)
+			{
+				<p><strong>Customer:</strong> @Order.Customer.FirstName @Order.Customer.LastName</p>
+			}
+			<p><strong>Products:</strong></p>
+			<ul>
+				@foreach (var product in Order.Products)
+				{
+					<li>
+						<p><strong>Name:</strong> @product.Name</p>
+						<p><strong>Price:</strong> @product.Price</p>
+					</li>
+				}
+			</ul>
+			<p><strong>CreatedDate:</strong> @Order.CreatedDate</p>
+		}
+	</div>
+</div>
+
+
+<div class="fetch-all-orders">
+    <h4>Fetch All Orders</h4>
+    <button @onclick="FetchAllOrders">Fetch All Orders</button>
+</div>
+
+<div class="all-orders" style="margin-top: 20px;" hidden="@(!ShowAllOrders)">
+	<h4>All Orders</h4>
+	<style>
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            width: calc(33% - 20px); 
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+	@if (Orders != null)
+	{
+		<div class="product-grid">
+			@foreach (var order in Orders)
+			{
+				<div class="product-card">
+					<p><strong>Order ID:</strong> @order.OrderId</p>
+					<p><strong>Customer ID:</strong> @order.CustomerId</p>
+					@if (order.Customer != null)
+					{
+						<p><strong>Customer:</strong> @order.Customer.FirstName @order.Customer.LastName</p>
+					}
+					<div>
+						<strong>Products:</strong>
+						@foreach (var product in order.Products)
+						{
+							<div>
+								<p><strong>Name:</strong> @product.Name</p>
+								<p><strong>Price:</strong> @product.Price</p>
+							</div>
+						}
+					</div>
+					<p><strong>CreatedDate:</strong> @order.CreatedDate</p>
+				</div>
+			}
+		</div>
+	}
+</div>
+
+@code {
+    private HttpClient httpClient;
+    public CreateOrderDto NewOrder { get; set; } = new();
+    private GetOrderDto? Order { get; set; } = new();
+    private List<GetOrderDto>? Orders { get; set; }
+    private bool ShowOrderDetails = false;
+    private bool ShowAllOrders = false;
+    private string ProductIdsString { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+    }
+
+    private async Task CreateOrder()
+    {
+        var productIds = ProductIdsString.Split(',').Select(int.Parse).ToList();
+
+        NewOrder.ProductIds = productIds;
+
+        var response = await httpClient.PostAsJsonAsync("/orders", NewOrder);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NewOrder = new CreateOrderDto();
+        }
+    }
+
+    private async Task FetchOrder()
+    {
+	    var response = await httpClient.GetAsync($"/orders/{Order.OrderId}");
+
+	    if (response.IsSuccessStatusCode)
+	    {
+		    var order = await response.Content.ReadFromJsonAsync<GetOrderDto>();
+		    Order = order;
+
+		    ShowOrderDetails = true;
+	    }
+    }
+
+    private async Task FetchAllOrders()
+    {
+        var response = await httpClient.GetAsync("/orders");
+
+        if (response.IsSuccessStatusCode)
+        {
+            Orders = await response.Content.ReadFromJsonAsync<List<GetOrderDto>>();
+            ShowAllOrders = true;
+        }
+    }
+
+    private void NavigateToProducts()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void NavigateToCustomers()
+    {
+        NavigationManager.NavigateTo("/Customers");
+    }
+}
+

@@ -1,0 +1,250 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@using Labb2WebbTemplate.shared.DTOs
+@inject IHttpClientFactory HttpClientFactory
+<PageTitle>Home</PageTitle>
+
+<button @onclick="NavigateToCustomers">Go to Customers page</button>
+<button @onclick="NavigateToCustomerOrderPage">Go to Customer Order Page</button>
+
+<h1>Products</h1>
+
+
+<button @onclick="GetProducts">Get Products</button>
+
+<h2>Fetch Product By ID</h2>
+
+<input type="text" @bind="ProductId" placeholder="Enter Product ID" />
+<button @onclick="FetchProduct">Fetch Product</button>
+
+@if (FetchedProduct != null)
+{
+	<div>
+		<h3>@FetchedProduct.Name</h3>
+		<p><strong>ID:</strong> @FetchedProduct.Id</p>
+		<p><strong>Price:</strong> @FetchedProduct.Price</p>
+		<p><strong>Description:</strong> @FetchedProduct.Description</p>
+		<p><strong>Type:</strong> @FetchedProduct.ProductType</p>
+		<p><strong>Inventory:</strong> @FetchedProduct.Inventory</p>
+		<p><strong>Inventory Balance:</strong> @FetchedProduct.InventoryBalance</p>
+	</div>
+}
+
+
+
+
+<div class="product-grid">
+	@foreach (GetProductDto product in Products)
+	{
+		<div class="product-card">
+			<h3>@product.Name</h3>
+			<p><strong>Id:</strong> @product.Id</p>
+			<p><strong>Price:</strong> @product.Price</p>
+			<p><strong>Description:</strong> @product.Description</p>
+			<p><strong>Type:</strong> @product.ProductType</p>
+			<p><strong>Inventory:</strong> @product.Inventory</p>
+			<p><strong>Inventory Balance:</strong> @product.InventoryBalance</p>
+			<button @onclick="() => RemoveProduct(product)">Remove</button>
+			<button @onclick="() => EditProduct(product)">Edit</button>
+		</div>
+	}
+</div>
+
+@if (EditingProduct != null)
+{
+	<div class="edit-form">
+		<h2>Edit Product</h2>
+		<form>
+			<label for="productName">Product Name:</label>
+			<input type="text" id="productName" @bind="EditingProduct.Name" /><br />
+			<label for="productDescription">Product Description:</label>
+			<input type="text" id="productDescription" @bind="EditingProduct.Description" /><br />
+			<label for="productPrice">Product Price:</label>
+			<input type="text" id="productPrice" @bind="EditingProduct.Price" /><br />
+			<label for="productType">Product Type:</label>
+			<input type="text" id="productType" @bind="EditingProduct.ProductType" /><br />
+			<label for="productInventory">Product Inventory:</label>
+			<input type="text" id="productInventory" @bind="EditingProduct.Inventory" /><br />
+			<label for="productInventoryBalance">Product Inventory Balance:</label>
+			<input type="checkbox" id="inventoryBalance" @bind="EditingProduct.InventoryBalance" /><br />
+			<button type="submit" @onclick="() => UpdateProduct(EditingProduct)">Save Changes</button>
+			<button type="button" @onclick="CancelEdit">Cancel</button>
+		</form>
+	</div>
+}
+
+
+
+
+<h2>Add New Product</h2>
+<form>
+	<label for="productName">Product Name:</label>
+	<input type="text" id="productName" @bind="NewProduct.Name" /><br />
+
+	<label for="productDescription">Description:</label>
+	<input type="text" id="productDescription" @bind="NewProduct.Description" /><br />
+
+	<label for="productPrice">Price:</label>
+	<input type="number" id="productPrice" @bind="NewProduct.Price" /><br />
+
+	<label for="productType">Product Type:</label>
+	<input type="text" id="productType" @bind="NewProduct.ProductType" /><br />
+
+	<label for="productInventory">Inventory:</label>
+	<input type="number" id="productInventory" @bind="NewProduct.Inventory" /><br />
+
+	<label for="inventoryBalance">Inventory Balance:</label>
+	<input type="checkbox" id="inventoryBalance" @bind="NewProduct.InventoryBalance" /><br />
+
+	<button type="submit" @onclick="AddProduct">Add Product</button>
+</form>
+
+
+
+
+@code
+{
+
+	public List<GetProductDto> Products { get; set; } = new();
+	public PostProductDto NewProduct { get; set; } = new();
+	public UpdateProductDto EditingProduct { get; set; } = new();
+
+	// protected override async Task OnInitializedAsync()
+	// {
+	//     var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate"); //Den vi skapade i Client i program.cs
+	//     var response = await httpClient.GetAsync("/products");
+
+	//     if (response.IsSuccessStatusCode)
+	//     {
+	//      var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
+	//      Products.AddRange(products);
+	//     }
+
+	//     // var bodyAsString = response.Content.ReadAsStringAsync();
+
+	// }
+
+	private async Task GetProducts()
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+		var response = await httpClient.GetAsync("/products");
+
+		if (response.IsSuccessStatusCode)
+		{
+			var products = await response.Content.ReadFromJsonAsync<List<GetProductDto>>();
+
+			Products.Clear();
+
+			Products.AddRange(products);
+		}
+	}
+
+	private async Task AddProduct()
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+
+		var response = await httpClient.PostAsJsonAsync("/products", NewProduct);
+
+		if (response.IsSuccessStatusCode)
+		{
+			NewProduct = new PostProductDto();
+		}
+	}
+
+	private async Task RemoveProduct(GetProductDto product)
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+		var response = await httpClient.DeleteAsync($"/products/{product.Id}");
+
+		if (response.IsSuccessStatusCode)
+		{
+			// Ta bort produkten från listan när den har tagits bort från databasen
+			Products.Remove(product);
+		}
+
+	}
+
+
+	private async Task EditProduct(GetProductDto product)
+	{
+		EditingProduct = new UpdateProductDto
+		{
+			Id = product.Id,
+			Name = product.Name,
+			Description = product.Description,
+			Price = product.Price,
+			ProductType = product.ProductType,
+			Inventory = product.Inventory,
+			InventoryBalance = product.InventoryBalance
+		};
+	}
+
+	private async Task UpdateProduct(UpdateProductDto product)
+	{
+		var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+		var response = await httpClient.PutAsJsonAsync($"/products/{product.Id}", EditingProduct);
+
+		if (response.IsSuccessStatusCode)
+		{
+			
+			EditingProduct = new UpdateProductDto();
+			
+
+			EditingProduct = null;
+		}
+	}
+
+	private void CancelEdit()
+	{
+		EditingProduct = null;
+	}
+
+
+
+	private string ProductId;
+	private GetProductDto FetchedProduct;
+
+	private async Task FetchProduct()
+	{
+		if (!string.IsNullOrEmpty(ProductId))
+		{
+			var httpClient = HttpClientFactory.CreateClient("Labb2WebbTemplate");
+			var response = await httpClient.GetAsync($"/products/{ProductId}");
+
+			if (response.IsSuccessStatusCode)
+			{
+				Products.Clear();
+
+				FetchedProduct = await response.Content.ReadFromJsonAsync<GetProductDto>();
+			}
+			
+		}
+	}
+
+	private void NavigateToCustomers()
+	{
+		NavigationManager.NavigateTo("/Customers");
+	}
+
+	private void NavigateToCustomerOrderPage()
+	{
+		NavigationManager.NavigateTo("/Orders");
+	}
+}
+
+<style>
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            width: calc(33% - 20px); /* Tar upp en tredjedel av bredden med 20px mellanrum */
+            margin-bottom: 20px; /* Mellanrum mellan varje produktkort */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
