@@ -22,24 +22,34 @@
 </form>
 
 <div class="fetch-order">
-    <h4>Fetch Order by ID</h4>
-    <input type="number" @bind="Order.OrderId" />
-    <button @onclick="FetchOrder">Fetch Order</button>
-    <div class="order-details" style="margin-top: 20px;" hidden="@(!ShowOrderDetails)">
-	    <h4>Order Details</h4>
-	    @if (Order != null)
-	    {
-		    <p><strong>Order ID:</strong> @Order.OrderId</p>
-		    <p><strong>Customer ID:</strong> @Order.CustomerId</p>
-		    @if (Order.Customer != null)
-		    {
-			    <p><strong>Customer:</strong> @Order.Customer.FirstName @Order.Customer.LastName</p>
-		    }
-		    <p><strong>Product ID:</strong> @string.Join(",", Order.Products.Select(p => p))</p>
-		    <p><strong>CreatedDate:</strong> @Order.CreatedDate</p>
-	    }
-    </div>
+	<h4>Fetch Order by ID</h4>
+	<input type="number" @bind="Order.OrderId" />
+	<button @onclick="FetchOrder">Fetch Order</button>
+	<div class="order-details" style="margin-top: 20px;" hidden="@(!ShowOrderDetails)">
+		<h4>Order Details</h4>
+		@if (Order != null)
+		{
+			<p><strong>Order ID:</strong> @Order.OrderId</p>
+			<p><strong>Customer ID:</strong> @Order.CustomerId</p>
+			@if (Order.Customer != null)
+			{
+				<p><strong>Customer:</strong> @Order.Customer.FirstName @Order.Customer.LastName</p>
+			}
+			<p><strong>Products:</strong></p>
+			<ul>
+				@foreach (var product in Order.Products)
+				{
+					<li>
+						<p><strong>Name:</strong> @product.Name</p>
+						<p><strong>Price:</strong> @product.Price</p>
+					</li>
+				}
+			</ul>
+			<p><strong>CreatedDate:</strong> @Order.CreatedDate</p>
+		}
+	</div>
 </div>
+
 
 <div class="fetch-all-orders">
     <h4>Fetch All Orders</h4>
